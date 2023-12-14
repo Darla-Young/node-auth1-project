@@ -1,4 +1,5 @@
 const Users = require('../users/users-model')
+const bcrypt = require('bcryptjs')
 
   // If the user does not have a session saved in the server:
   //   status 401 message: "You shall not pass!"
@@ -9,18 +10,26 @@ function restricted(req, res, next) {
 
   // If the username in req.body already exists in the database:
   //   status 422 message: "Username taken"
-function checkUsernameFree(req, res, next) {
-  const existing = Users.findBy('username', req.body.username)
-  if (existing[0]) res.status(422).json({message: "Username taken"})
+async function checkUsernameFree(req, res, next) {
+  const existing = await Users.findBy('username', req.body.username)
+  if (existing) res.status(422).json({message: "Username taken"})
   else next()
 }
 
   // If the username in req.body does NOT exist in the database:
   //   status 401 message: "Invalid credentials"
-function checkUsernameExists(req, res, next) {
-  const existing = Users.findBy('username', req.body.username)
-  if (!existing[0]) res.status(401).json({message: "Invalid credentials"})
-  else next()
+async function checkUsernameExists(req, res, next) {
+  const user = await Users.findBy('username', req.body.username)
+  const credentials = req.body
+
+  if (!user || !bcrypt.compareSync(credentials.password, user.password)) {
+    return res.status(401).json({message: "Invalid credentials"})
+  }
+  else {
+    req.session.user_id = user.user_id
+    req.session.name = user.username
+    next()
+  }
 }
 
   // If password is missing from req.body, or if it's 3 chars or shorter:

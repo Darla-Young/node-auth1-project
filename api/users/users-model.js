@@ -6,13 +6,15 @@ function find() {
 }
 
   // resolves to an ARRAY with all users that match the filter condition
-function findBy(field, value) {
-  return db('users').where(field, '=', value)
+async function findBy(field, value) {
+  const user = await db('users').where(field.toString(), '=', value.toString())
+  return user[0]
 }
 
   // resolves to the user { user_id, username } with the given user_id
-function findById(user_id) {
-  return db('users').where('user_id', '=', user_id).first()
+async function findById(user_id) {
+  const user = await db('users').where('user_id', '=', user_id)
+  return user[0]
 }
 
   // resolves to the newly inserted user { user_id, username }
