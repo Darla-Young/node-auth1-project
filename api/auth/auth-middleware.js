@@ -9,16 +9,16 @@ function restricted(req, res, next) {
 
   // If the username in req.body already exists in the database:
   //   status 422 message: "Username taken"
-async function checkUsernameFree(req, res, next) {
-  const existing = await Users.findBy('username', '=', req.body.username)
+function checkUsernameFree(req, res, next) {
+  const existing = Users.findBy('username', req.body.username)
   if (existing[0]) res.status(422).json({message: "Username taken"})
   else next()
 }
 
   // If the username in req.body does NOT exist in the database:
   //   status 401 message: "Invalid credentials"
-async function checkUsernameExists(req, res, next) {
-  const existing = await Users.findBy('username', '=', req.body.username)
+function checkUsernameExists(req, res, next) {
+  const existing = Users.findBy('username', req.body.username)
   if (!existing[0]) res.status(401).json({message: "Invalid credentials"})
   else next()
 }

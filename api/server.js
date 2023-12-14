@@ -23,7 +23,7 @@ server.use(helmet());
 server.use(express.json());
 server.use(cors());
 server.use('/api/users', UsersRouter)
-// server.use('/api/auth', AuthRouter)
+server.use('/api/auth', AuthRouter)
 
 server.get("/", (req, res) => {
   res.json({ api: "up" });
